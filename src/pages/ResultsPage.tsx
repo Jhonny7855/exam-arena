@@ -30,6 +30,7 @@ export default function ResultsPage() {
   const syllabus = useMemo(() => unitsFor(subject), [subject])
   const [filter, setFilter] = useState<'all' | 'incorrect' | 'correct' | 'unanswered'>('all')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [expandAll, setExpandAll] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
   const [reviewIndex, setReviewIndex] = useState(0)
   const [unlockOpen, setUnlockOpen] = useState(false)
@@ -297,23 +298,60 @@ export default function ResultsPage() {
       <Card className="p-4">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
           <h3 className="text-[13.5px] font-semibold">Full answer review</h3>
-          <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
-            {([
-              ['all', 'All', attempt.total],
-              ['correct', 'Correct', attempt.correct],
-              ['incorrect', 'Wrong', attempt.incorrect],
-              ['unanswered', 'Skipped', attempt.unanswered],
-            ] as const).map(([value, label, count]) => (
-              <button
-                key={value}
-                onClick={() => setFilter(value)}
-                className={`px-2.5 h-7 rounded-md text-[11.5px] font-medium transition-colors ${
-                  filter === value ? 'bg-[var(--surface)] text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
-              >
-                {label} <span className="mono text-faint">{count}</span>
-              </button>
-            ))}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => { setExpandAll((v) => !v); setExpanded(null) }}
+              className="px-2.5 h-7 rounded-md text-[11.5px] font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+            >
+              {expandAll ? 'Collapse all' : 'Expand all'}
+            </button>
+            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              {([
+                ['all', 'All', attempt.total],
+                ['correct', 'Correct', attempt.correct],
+                ['incorrect', 'Wrong', attempt.incorrect],
+                ['unanswered', 'Skipped', attempt.unanswered],
+              ] as const).map(([value, label, count]) => (
+                <button
+                  key={value}
+                  onClick={() => setFilter(value)}
+                  className={`px-2.5 h-7 rounded-md text-[11.5px] font-medium transition-colors ${
+                    filter === value ? 'bg-[var(--surface)] text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  {label} <span className="mono text-faint">{count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-3 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2.5">
+          <div className="text-[10.5px] uppercase tracking-wider text-faint mb-1.5">Answer key</div>
+          <div className="flex flex-wrap gap-1">
+            {attempt.answers.map((a, qi) => {
+              const q = QUESTION_BY_ID[a.questionId]
+              if (!q) return null
+              const isCorrect = a.selected === q.correctAnswer
+              const isUnanswered = a.selected === null
+              return (
+                <button
+                  key={a.questionId}
+                  onClick={() => { setExpandAll(false); setExpanded(a.questionId) }}
+                  title={`Q${qi + 1} · correct ${String.fromCharCode(65 + q.correctAnswer)}${isUnanswered ? ' · skipped' : isCorrect ? ' · you were right' : ` · you chose ${String.fromCharCode(65 + a.selected!)}`}`}
+                  className={`h-6 min-w-6 px-1 rounded mono text-[10.5px] font-semibold border transition-colors ${
+                    isUnanswered
+                      ? 'border-[var(--border)] text-[var(--text-faint)] hover:border-[var(--warning)]'
+                      : isCorrect
+                        ? 'border-[color-mix(in_srgb,var(--success)_45%,transparent)] bg-[var(--success-soft)] text-[var(--success)]'
+                        : 'border-[color-mix(in_srgb,var(--danger)_45%,transparent)] bg-[var(--danger-soft)] text-[var(--danger)]'
+                  }`}
+                >
+                  {qi + 1}
+                  <span className="text-[9px] opacity-70">{String.fromCharCode(65 + q.correctAnswer)}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
@@ -326,14 +364,21 @@ export default function ResultsPage() {
             if (!q) return null
             const isCorrect = a.selected === q.correctAnswer
             const isUnanswered = a.selected === null
-            const open = expanded === a.questionId
+            const open = expandAll || expanded === a.questionId
             const saved = data.savedQuestions.includes(q.id)
             const originalIndex = attempt.answers.findIndex((x) => x.questionId === a.questionId)
 
             return (
               <div key={a.questionId} className="rounded-xl border border-[var(--border)] overflow-hidden">
                 <button
-                  onClick={() => setExpanded(open ? null : a.questionId)}
+                  onClick={() => {
+                    if (expandAll) {
+                      setExpandAll(false)
+                      setExpanded(null)
+                      return
+                    }
+                    setExpanded(open ? null : a.questionId)
+                  }}
                   className="w-full text-left p-3 flex items-start gap-2.5 hover:bg-[var(--surface-2)]/50 transition-colors"
                 >
                   <span className="mt-0.5 shrink-0">

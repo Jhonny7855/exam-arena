@@ -125,6 +125,7 @@ export function PracticeEngine({ questions, mode, title, subtitle, onComplete, e
   if (finished) {
     const pct = stats.total ? Math.round((stats.correct / stats.total) * 100) : 0
     return (
+      <div className="space-y-3">
       <Card className="p-6 text-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -152,6 +153,60 @@ export function PracticeEngine({ questions, mode, title, subtitle, onComplete, e
           <Button variant="ghost" onClick={() => navigate('/')}>Dashboard</Button>
         </div>
       </Card>
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <h3 className="text-[13.5px] font-semibold">Answer key</h3>
+          <span className="text-[11px] mono text-faint">
+            {stats.correct} correct · {stats.total - stats.correct} wrong
+          </span>
+        </div>
+        <div className="space-y-2">
+          {questions.map((q, qi) => {
+            const picked = answered[q.id]
+            const skipped = picked === undefined || picked === null
+            const right = picked === q.correctAnswer
+            return (
+              <div
+                key={q.id}
+                className={`rounded-lg border p-2.5 ${
+                  skipped
+                    ? 'border-[var(--border)]'
+                    : right
+                      ? 'border-[color-mix(in_srgb,var(--success)_40%,transparent)] bg-[var(--success-soft)]'
+                      : 'border-[color-mix(in_srgb,var(--danger)_40%,transparent)] bg-[var(--danger-soft)]'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                  <span className="text-[10.5px] mono text-faint">Q{qi + 1}</span>
+                  <span className="text-[10px] text-faint">·</span>
+                  <span className="text-[10.5px] text-faint truncate">{q.topic}</span>
+                  {skipped ? (
+                    <Badge tone="warning" className="ml-auto shrink-0">Skipped</Badge>
+                  ) : right ? (
+                    <Badge tone="success" className="ml-auto shrink-0">Correct</Badge>
+                  ) : (
+                    <Badge tone="danger" className="ml-auto shrink-0">Wrong</Badge>
+                  )}
+                </div>
+                <p className="text-[12.5px] leading-relaxed mb-1.5">{q.question}</p>
+                <div className="text-[11.5px] space-y-0.5">
+                  <div className="text-[var(--success)]">
+                    <span className="font-semibold">Answer {String.fromCharCode(65 + q.correctAnswer)}:</span> {q.options[q.correctAnswer]}
+                  </div>
+                  {!skipped && !right && (
+                    <div className="text-[var(--danger)]">
+                      <span className="font-semibold">You chose {String.fromCharCode(65 + picked!)}:</span> {q.options[picked!]}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[11.5px] text-muted leading-relaxed mt-1.5">{q.explanation}</p>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+      </div>
     )
   }
 
