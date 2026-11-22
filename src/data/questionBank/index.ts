@@ -7,6 +7,7 @@ import { unit3Families } from './unit3'
 import { unit4Families, unit5Families } from './unit45'
 import { unit6Families, unit7Families } from './unit67'
 import { daaFamilies } from './daa'
+import { ESSENTIAL_QUESTIONS } from '../essentials'
 
 export const TAFL_FAMILIES: Family[] = [
   ...unit1Families,
@@ -121,8 +122,10 @@ export const QUESTIONS: Question[] = [...BANK_BY_SUBJECT.tafl, ...BANK_BY_SUBJEC
 export const BANK_ISSUES: BankIssue[] = [...ISSUES_BY_SUBJECT.tafl, ...ISSUES_BY_SUBJECT.daa]
 
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(
-  QUESTIONS.map((q) => [q.id, q]),
+  [...QUESTIONS, ...ESSENTIAL_QUESTIONS].map((q) => [q.id, q]),
 )
+
+export const ALL_QUESTIONS: Question[] = [...QUESTIONS, ...ESSENTIAL_QUESTIONS]
 
 export function questionsOfSubject(subject: SubjectId): Question[] {
   return BANK_BY_SUBJECT[subject]

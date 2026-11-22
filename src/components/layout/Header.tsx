@@ -6,6 +6,7 @@ import { levelForXp } from '../../services/gamification'
 import { TESTS_BY_SUBJECT } from '../../data/tests'
 import { questionsOfSubject } from '../../data/questionBank'
 import { CHEATSHEET_BY_SUBJECT } from '../../data/cheatsheet'
+import { essentialsOf } from '../../data/essentials'
 import { useActiveSubject, useSubjectMeta } from '../../hooks/useSubject'
 import { IconButton } from '../common/ui'
 import { SubjectSwitcher } from './SubjectSwitcher'
@@ -16,6 +17,7 @@ const TITLES: Record<string, { title: string; crumb: string }> = {
   '/practice': { title: 'Unit Practice', crumb: 'Training' },
   '/random': { title: 'Random Exam', crumb: 'Training' },
   '/weak': { title: 'Weak Topics', crumb: 'Training' },
+  '/essentials': { title: '150 Essentials', crumb: 'Training' },
   '/cheatsheet': { title: 'Cheatsheet', crumb: 'Training' },
   '/revision': { title: 'Revision Center', crumb: 'Training' },
   '/analytics': { title: 'Analytics', crumb: 'Performance' },
@@ -88,6 +90,16 @@ export function Header({ onOpenMobile }: { onOpenMobile: () => void }) {
       }
       const hit = section.formulas.find((f) => f.label.toLowerCase().includes(q))
       if (hit) out.push({ label: hit.label, sub: `Cheatsheet · Unit ${section.unit}`, to: '/cheatsheet' })
+    }
+    for (const item of essentialsOf(subject)) {
+      if (out.length >= 15) break
+      if (item.question.toLowerCase().includes(q)) {
+        out.push({
+          label: item.question,
+          sub: `Essentials · Unit ${item.unit} · ${item.topic}`,
+          to: `/essentials?unit=${item.unit}`,
+        })
+      }
     }
     return out
   })()

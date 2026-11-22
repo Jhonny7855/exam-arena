@@ -14,6 +14,7 @@ import { scoreAttempt } from '../src/services/scoring'
 import { masteryFor } from '../src/services/analytics'
 import { levelForXp, LEVELS } from '../src/services/gamification'
 import { addOrUpdateRevision, dueRevisionQuestions, markMastered } from '../src/services/revision'
+import { ESSENTIALS_BY_SUBJECT, ESSENTIAL_ISSUES, ESSENTIAL_QUESTIONS, essentialsOfUnit } from '../src/data/essentials'
 import { emptyData } from '../src/services/storage'
 import { masterCase, nQueensCount } from '../src/lib/algorithms'
 import type { SubjectId } from '../src/types'
@@ -331,6 +332,69 @@ describe('revision scheduling', () => {
     markMastered(data, id)
     expect(data.revision[0].mastered).toBe(true)
     expect(dueRevisionQuestions(data, 5)).toHaveLength(0)
+  })
+})
+
+describe('essentials', () => {
+  it('ships exactly 150 curated questions per subject', () => {
+    for (const subject of SUBJECT_IDS) expect(ESSENTIALS_BY_SUBJECT[subject]).toHaveLength(150)
+    expect(ESSENTIAL_QUESTIONS).toHaveLength(300)
+  })
+
+  it('passes its own integrity gate', () => {
+    expect(ESSENTIAL_ISSUES).toEqual([])
+  })
+
+  it('uses unique ids that do not collide with the generated bank', () => {
+    const ids = ESSENTIAL_QUESTIONS.map((q) => q.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const id of ids) {
+      expect(id).toMatch(/^(TAFL|DAA)-ESS-\d{3}$/)
+      expect(QUESTIONS.some((q) => q.id === id)).toBe(false)
+      expect(QUESTION_BY_ID[id]).toBeDefined()
+    }
+  })
+
+  it('has well-formed options with a valid answer index', () => {
+    for (const q of ESSENTIAL_QUESTIONS) {
+      expect(q.options).toHaveLength(4)
+      expect(new Set(q.options.map((o) => o.trim())).size).toBe(4)
+      expect(q.options.every((o) => o.trim().length > 0)).toBe(true)
+      expect(q.correctAnswer).toBeGreaterThanOrEqual(0)
+      expect(q.correctAnswer).toBeLessThan(4)
+      expect(q.explanation.length).toBeGreaterThanOrEqual(40)
+      expect(q.optionExplanations.every((e) => e.length >= 10)).toBe(true)
+    }
+  })
+
+  it('never uses a generic filler option', () => {
+    const offenders = ESSENTIAL_QUESTIONS.filter((q) =>
+      q.options.some((o, i) => GENERIC_FILLERS.some((g) => o.includes(g) || q.optionExplanations[i].includes(g))),
+    )
+    expect(offenders.map((q) => q.id)).toEqual([])
+  })
+
+  it('covers every syllabus unit for both subjects', () => {
+    for (const subject of SUBJECT_IDS) {
+      for (const unit of unitsFor(subject)) {
+        expect(essentialsOfUnit(subject, unit.id).length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('spans all three difficulties per subject', () => {
+    for (const subject of SUBJECT_IDS) {
+      for (const d of ['Easy', 'Medium', 'Hard'] as const) {
+        expect(ESSENTIALS_BY_SUBJECT[subject].filter((q) => q.difficulty === d).length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('resolves through revision scheduling like bank questions', () => {
+    const data = emptyData()
+    const q = ESSENTIAL_QUESTIONS[0]
+    addOrUpdateRevision(data, q.id, 'wrong', false)
+    expect(dueRevisionQuestions(data, 5).map((x) => x.id)).toContain(q.id)
   })
 })
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Info, BookOpen, Cpu, Layers, Database, Shield, Sparkles, Swords, Target, Repeat,
-  BarChart3, Trophy, Settings as SettingsIcon, Github, CheckCircle2, NotebookText,
+  BarChart3, Trophy, Settings as SettingsIcon, Github, CheckCircle2, NotebookText, ListChecks,
 } from 'lucide-react'
 import { Card, Badge, SectionHeader, Button, ProgressBar } from '../components/common/ui'
 import { unitsFor, stagesFor } from '../data/syllabus'
@@ -17,6 +17,7 @@ const MODULES = [
   { to: '/practice', label: 'Unit Practice', desc: 'Instant-feedback drills for every syllabus unit.', icon: Layers },
   { to: '/random', label: 'Random & Daily', desc: 'Balanced 30-question exams and a daily 10-question challenge.', icon: Sparkles },
   { to: '/weak', label: 'Weak Topics', desc: 'Rule-based weakness detection with targeted drills.', icon: Target },
+  { to: '/essentials', label: '150 Essentials', desc: 'The most important questions, curated per unit, with answers.', icon: ListChecks },
   { to: '/cheatsheet', label: 'Cheatsheet', desc: 'Per-unit formulas, key notes and the traps exams target.', icon: NotebookText },
   { to: '/revision', label: 'Revision Center', desc: 'Spaced repetition over wrong answers and saved questions.', icon: Repeat },
   { to: '/analytics', label: 'Analytics', desc: 'Unit, topic and difficulty breakdowns with trend charts.', icon: BarChart3 },

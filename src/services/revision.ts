@@ -1,5 +1,5 @@
 import type { AppData, Question, RevisionItem } from '../types'
-import { QUESTIONS } from '../data/questionBank'
+import { QUESTION_BY_ID } from '../data/questionBank'
 
 export const REVISION_INTERVALS_DAYS = [1, 3, 7, 14, 30]
 
@@ -83,7 +83,7 @@ export interface RevisionBucket {
 
 export function revisionBuckets(data: AppData): RevisionBucket {
   const now = Date.now()
-  const valid = data.revision.filter((r) => QUESTIONS.some((q) => q.id === r.questionId))
+  const valid = data.revision.filter((r) => Boolean(QUESTION_BY_ID[r.questionId]))
   return {
     wrong: valid.filter((r) => r.source === 'wrong' && !r.mastered),
     saved: valid.filter((r) => r.source === 'saved' && !r.mastered),
@@ -98,7 +98,7 @@ export function dueRevisionQuestions(data: AppData, limit = 30): Question[] {
   const scored = data.revision
     .filter((r) => !r.mastered)
     .map((r) => {
-      const q = QUESTIONS.find((x) => x.id === r.questionId)
+      const q = QUESTION_BY_ID[r.questionId]
       if (!q) return null
       const overdue = now - r.dueAt
       const priority = (r.lapses * 3 + 1) * (1 + overdue / DAY_MS) * (r.successes > 0 ? 1 : 1.5)
@@ -130,7 +130,7 @@ export function removeRevision(data: AppData, questionId: string): void {
 export function dailyChallengeQuestions(data: AppData, todayStr: string): Question[] {
   if (data.dailyChallenge.date === todayStr && data.dailyChallenge.questionIds.length) {
     return data.dailyChallenge.questionIds
-      .map((id) => QUESTIONS.find((q) => q.id === id))
+      .map((id) => QUESTION_BY_ID[id])
       .filter((q): q is Question => Boolean(q))
   }
   return []
