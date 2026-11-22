@@ -294,3 +294,36 @@ body {
   50% { opacity: 1; }
 }
 
+/* ---------- print ---------- */
+
+@media print {
+  aside,
+  header,
+  .aurora,
+  .pulse-ring {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .surface-card {
+    border: 1px solid #bbb !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .mono {
+    color: #000 !important;
+  }
+}
+

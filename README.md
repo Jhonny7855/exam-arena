@@ -6,6 +6,7 @@ Two-subject exam trainer for **TAFL (Theory of Automata & Formal Languages)** an
 - 8,000+ validated questions across 13 units and 136 question families
 - Five-stage difficulty progression (Foundation → Master Arena)
 - Practice mode, revision queue with spaced repetition, analytics, achievements and XP
+- Per-unit cheatsheet with formulas, notes and the traps exams target
 - Subject switcher that re-themes the whole interface
 
 ## Stack
@@ -34,6 +35,16 @@ Analytics helpers and generation reports:
 npx vite-node scripts/subject-report.ts
 npx vite-node scripts/bank-report.ts
 npx vite-node scripts/filler-report.ts
+```
+
+## Cheatsheet
+
+`src/data/cheatsheet.ts` holds the per-unit formulas and exam traps rendered at
+`/cheatsheet` in the app. `CHEATSHEET.md` is generated from the same source, so the
+repo copy and the app can never drift:
+
+```bash
+npx vite-node scripts/export-cheatsheet.ts
 ```
 
 ## Deployment

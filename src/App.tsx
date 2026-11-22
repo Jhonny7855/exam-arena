@@ -14,6 +14,7 @@ const ResultsPage = lazy(() => import('./pages/ResultsPage'))
 const UnitPracticePage = lazy(() => import('./pages/UnitPracticePage'))
 const RandomExamPage = lazy(() => import('./pages/RandomExamPage'))
 const WeakTopicsPage = lazy(() => import('./pages/WeakTopicsPage'))
+const CheatsheetPage = lazy(() => import('./pages/CheatsheetPage'))
 const RevisionPage = lazy(() => import('./pages/RevisionPage'))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage'))
@@ -105,6 +106,7 @@ export default function App() {
                 <Route path="/practice/:unitId" element={<UnitDetailPage />} />
                 <Route path="/random" element={<RandomExamPage />} />
                 <Route path="/weak" element={<WeakTopicsPage />} />
+                <Route path="/cheatsheet" element={<CheatsheetPage />} />
                 <Route path="/revision" element={<RevisionPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/achievements" element={<AchievementsPage />} />

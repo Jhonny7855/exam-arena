@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Zap, Flame, Trophy, Target, Play, Shuffle, Repeat, Calendar, ArrowRight,
-  CheckCircle2, TrendingUp, Clock, BookOpen, Sparkles, Swords,
+  CheckCircle2, TrendingUp, Clock, BookOpen, Sparkles, Swords, NotebookText,
 } from 'lucide-react'
 import { useArena } from '../store/arena'
 import { useActiveSubject, useSubjectMeta } from '../hooks/useSubject'
@@ -57,6 +57,7 @@ export default function DashboardPage() {
     },
     { title: 'Start random exam', desc: '30 balanced questions, all units.', icon: Shuffle, to: '/random', tone: 'secondary' },
     { title: 'Practice weak topics', desc: 'Targeted drills from your data.', icon: Target, to: '/weak', tone: 'warning' },
+    { title: 'Read cheatsheet', desc: 'Formulas and traps for every unit.', icon: NotebookText, to: '/cheatsheet', tone: 'accent' },
     { title: 'Daily challenge', desc: challengeDone ? 'Completed today.' : '10 questions · +25 XP', icon: Calendar, to: '/random?mode=daily', tone: 'success' },
   ]
 
